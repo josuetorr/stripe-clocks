@@ -1,0 +1,27 @@
+{
+  "name": "stripe-clocks",
+  "version": "1.0.0",
+  "description": "cmd tool to create clock event in stripe when in test-mode",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josuetorr/stripe-clocks.git"
+  },
+  "keywords": [
+    "stripe",
+    "clock",
+    "cmd",
+    "cmdline",
+    "command-line",
+    "tool"
+  ],
+  "author": "Josh Torres",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/josuetorr/stripe-clocks/issues"
+  },
+  "homepage": "https://github.com/josuetorr/stripe-clocks#readme"
+}
