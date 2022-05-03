@@ -2,9 +2,13 @@
   "name": "stripe-clocks",
   "version": "1.0.0",
   "description": "cmd tool to create clock event in stripe when in test-mode",
-  "main": "index.js",
+  "type": "module",
+  "exports": "./index.js",
   "scripts": {
-    "test": "npm run test"
+    "test": "./bin/index.js",
+    "dev": "tsc -w -p . ",
+    "build": "tsc -p . && chmod +x ./bin/index.js",
+    "clean": "rm -rf ./bin"
   },
   "repository": {
     "type": "git",
@@ -23,5 +27,18 @@
   "bugs": {
     "url": "https://github.com/josuetorr/stripe-clocks/issues"
   },
-  "homepage": "https://github.com/josuetorr/stripe-clocks#readme"
+  "homepage": "https://github.com/josuetorr/stripe-clocks#readme",
+  "devDependencies": {
+    "@types/chalk": "^2.2.0",
+    "typescript": "^4.7.0-dev.20220502"
+  },
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "stripe": "^8.219.0"
+  },
+  "main": "index.js",
+  "module": "main.js",
+  "bin": {
+    "stripe-clocks": "index.js"
+  }
 }
