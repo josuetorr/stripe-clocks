@@ -1,6 +1,11 @@
 #!/usr/bin/env node
-import { displayHelp, validateArgs, parseArgs } from "./cmd/index.js";
-import { InvalidArgError } from "./cmd/index.js";
+import {
+  InvalidArgError,
+  displayHelp,
+  validateArgs,
+  parseArgs,
+  StripeHandler,
+} from "./cmd/index.js";
 
 try {
   validateArgs();
@@ -10,6 +15,8 @@ try {
     displayHelp();
     process.exit(0);
   }
+
+  new StripeHandler({});
 } catch (error) {
   if (error instanceof InvalidArgError) {
     console.error(error.message);
