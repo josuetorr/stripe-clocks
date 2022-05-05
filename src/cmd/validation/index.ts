@@ -11,9 +11,6 @@ export class InvalidArgError extends Error {
   }
 }
 
-const DATE_FORMAT = "DD-MM-YYYY";
-const EXP_DATE_FORMAT = "MM-YYYY";
-
 export const VALID_FLAGS = {
   email: { description: "\t\tcustomer email" },
   customerId: { description: "\t\tcustomer id" },
@@ -38,8 +35,13 @@ export const VALID_FLAGS = {
   },
 };
 
-const isValidDateFormat = (str: string) =>
-  str.match(/\d\d(-|\/)\d\d(-|\/)\d\d\d\d/);
+const DATE_FORMAT = "DD-MM-YYYY";
+const EXP_DATE_FORMAT = "MM-YYYY";
+
+const DATE_FORMAT_REGEX = /\d\d(-|\/)\d\d(-|\/)\d\d\d\d/;
+const EXP_DATE_REGEX = /\d\d(-|\/)\d\d\d\d/;
+const CARD_NUMBER_REGEX = /\d{16}/;
+const CVC_REGEX = /\d{3}/;
 
 const validateArgs = (args: any) => {
   for (const flag of Object.keys(args)) {
@@ -49,13 +51,7 @@ const validateArgs = (args: any) => {
 
   // make sure either paymentMethod is defined or the information for a card, i.e. number, exp, cvc
   const { paymentMethod, cardNumber, exp, cvc } = Object.entries(args)
-    .filter(
-      ([flag]) =>
-        flag === "paymentMethod" ||
-        flag === "cardNumber" ||
-        flag === "cvc" ||
-        flag === "exp"
-    )
+    .filter(([flag]) => flag === "paymentMethod" || flag === "exp")
     .reduce(
       (acc, [flag, arg]) => {
         return { ...acc, [flag]: arg };
@@ -63,27 +59,29 @@ const validateArgs = (args: any) => {
       { paymentMethod: "", cardNumber: "", cvc: "", exp: "" }
     );
 
-  if (!paymentMethod && (!cardNumber || !exp || !cvc))
-    throw new InvalidArgError(
-      1,
-      `Please enter a payment method: ${chalk.bold(
-        "[paymentMethod] | [cardNumber cvc exp])"
-      )}`
-    );
-
   // validate dates
-  if (!paymentMethod && !exp.match(/\d\d(-|\/)\d\d\d\d/))
-    throw new InvalidArgError(
-      1,
-      `Please enter a valid date for exp ${chalk.bold(`(${EXP_DATE_FORMAT})`)}`
-    );
+  if (!paymentMethod) {
+    if (exp && !exp.match(EXP_DATE_REGEX))
+      throw new InvalidArgError(
+        1,
+        `Please enter a valid date for exp ${chalk.bold(
+          `(${EXP_DATE_FORMAT})`
+        )}`
+      );
 
-  if (args.startAt && !isValidDateFormat(args.startAt))
+    if (cardNumber && !cardNumber.match(CARD_NUMBER_REGEX))
+      throw new InvalidArgError(1, `Please enter a valid card number`);
+
+    if (cvc && !cvc.match(CVC_REGEX))
+      throw new InvalidArgError(1, `Please enter a valid cvc`);
+  }
+
+  if (args.startAt && !args.startAt.match(DATE_FORMAT_REGEX))
     throw new InvalidArgError(
       1,
       `Invalid format for ${chalk.bold("startAt")} (${DATE_FORMAT})`
     );
-  if (args.endAt && !isValidDateFormat(args.endAt))
+  if (args.endAt && !args.endAt.match(DATE_FORMAT_REGEX))
     throw new InvalidArgError(
       1,
       `Invalid format for ${chalk.bold("endAt")} (${DATE_FORMAT})`

@@ -27,6 +27,13 @@ export abstract class StripeHandler {
         exp_month: parseInt(month),
         exp_year: parseInt(year),
       };
+    } else {
+      this._card = {
+        number: "4242424242424242",
+        exp_month: 4,
+        exp_year: 2023,
+        cvc: "314",
+      };
     }
 
     const today = new Date();
@@ -45,6 +52,11 @@ export abstract class StripeHandler {
       frozen_time: this._startAt,
       name: this._name,
     });
+  }
+
+  private async getProduct() {
+    const products = await this._stripe.products.list();
+    console.log(products);
   }
 
   getPaymentMethod(): Promise<Stripe.PaymentMethod> {
@@ -78,6 +90,10 @@ export abstract class StripeHandler {
       this._stripe.customers.update(customer.id, {
         invoice_settings: { default_payment_method: paymentMethod.id },
       });
+  }
+
+  getSubscription() {
+    this.getProduct();
   }
 
   abstract handleRequest(): Promise<void>;
