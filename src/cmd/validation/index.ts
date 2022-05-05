@@ -19,25 +19,23 @@ export const VALID_FLAGS = {
   exp: { description: "\t\t\tcard expiration date (MM-YYYY)" },
   cvc: { description: "\t\t\tcard cvc number" },
   startAt: {
-    description: "\t\tstarting date (DD-MM-YYYY) (defaults to today's date)",
+    description: "\t\tstarting date (DD-MM-YYYY). Defaults to today's date",
   },
   endAt: {
     description:
-      "\t\tthe date to which the clock will be advanced to (DD-MM-YYYY) (defaults to one month after today)",
+      "\t\tthe date to which the clock will be advanced to (DD-MM-YYYY). Defaults to one month after today",
   },
   name: { description: "\t\tname of test" },
   help: { description: "\t\tshow this content" },
+  type: {
+    description: "\t\ttype of clock (success or fail). Defaults to 'success'",
+  },
   apiKey: {
-    description: "\tapi key provided by stripe (required)",
+    description: "\t\tapi key provided by stripe (required)",
   },
 };
 
-export const parseArgs = (): HandlerProps => {
-  const args = argv.slice(2).reduce((acc, current) => {
-    const [flag, arg] = current.split("=");
-    return { ...acc, [flag.replace("--", "")]: arg };
-  }, {});
-
+const validateArgs = (args: any) => {
   for (const flag of Object.keys(args)) {
     if (!Object.keys(VALID_FLAGS).includes(flag))
       throw new InvalidArgError(1, `Unknown flag: ${chalk.bold(flag)}`);
@@ -72,6 +70,15 @@ export const parseArgs = (): HandlerProps => {
       1,
       `Please enter a valid date for exp ${chalk.bold("(MM-YYYY)")}`
     );
+};
+
+export const parseArgs = (): HandlerProps => {
+  const args = argv.slice(2).reduce((acc, current) => {
+    const [flag, arg] = current.split("=");
+    return { ...acc, [flag.replace("--", "")]: arg };
+  }, {});
+
+  validateArgs(args);
 
   return args;
 };

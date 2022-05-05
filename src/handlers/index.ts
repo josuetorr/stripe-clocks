@@ -4,56 +4,50 @@ import { HandlerProps, Card } from "../interfaces/index.js";
 
 export abstract class StripeHandler {
   protected _stripe: Stripe;
-  private _paymentMethod: string;
-  private _card: Card;
+  private _paymentMethod?: string;
+  private _card?: Card;
 
-  constructor(options: HandlerProps, apiKey?: string) {
+  constructor(props: HandlerProps, apiKey?: string) {
     if (!apiKey)
       throw new InvalidArgError(1, "Error: Stripe api key is required");
     this._stripe = new Stripe(apiKey, { apiVersion: "2020-08-27" });
 
+    if (props.paymentMethod) {
+      this._paymentMethod = props.paymentMethod;
+    } else if (props.exp && props.cardNumber && props.cvc) {
+      const [month, year] = props.exp.split("-");
+      this._card = {
+        number: props.cardNumber,
+        cvc: props.cvc,
+        exp_month: parseInt(month),
+        exp_year: parseInt(year),
+      };
+    }
   }
 
   abstract handleRequest(): Promise<void>;
 
-  async getPaymentMethod() {}
+  getPaymentMethod(): Promise<Stripe.PaymentMethod> {
+    if (this._paymentMethod)
+      return this._stripe.paymentMethods.create({
+        payment_method: this._paymentMethod,
+      });
+
+    return this._stripe.paymentMethods.create({
+      type: "card",
+      card: this._card,
+    });
+  }
 }
 
-export class RenewSuccessHandler extends StripeHandler {
-  async handleRequest(): Promise<void> {}
+export class RenewSuccessStripeHandler extends StripeHandler {
+  async handleRequest(): Promise<void> {
+    console.log("successful");
+  }
 }
 
-export class RenewFailedHandler extends StripeHandler {
-  async handleRequest(): Promise<void> {}
+export class RenewFailedStripeHandler extends StripeHandler {
+  async handleRequest(): Promise<void> {
+    console.log("failure");
+  }
 }
-
-// export default class StripeHandler {
-//   private email: string;
-//   private customerId: string;
-//   private paymentMethod: string;
-//   private cardNumber: string;
-//   private exp: string;
-//   private cvc: number;
-//   private startAt: Date;
-//   private endAt: Date;
-//   private name: string;
-//   private stripe: Stripe;
-//
-//   constructor(props: Props) {
-//     const today = new Date();
-//
-//     this.email = props.email ?? "";
-//     this.customerId = props.customerId ?? "";
-//     this.paymentMethod = props.paymentMethod ?? "";
-//     this.cardNumber = props.cardNumber ?? "";
-//     this.exp = props.exp ?? "";
-//     this.cvc = props.cvc ?? 314;
-//     this.startAt = props.startAt ? new Date(props.startAt) : new Date(today);
-//     this.endAt = props.endAt
-//       ? new Date(props.endAt)
-//       : new Date(today.setMonth(today.getMonth() + 1));
-//     this.name = props.name ?? "test";
-//
-//     this.stripe = new Stripe(props.apiKey, { apiVersion: "2020-08-27" });
-//   }
-// }
