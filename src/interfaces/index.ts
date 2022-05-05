@@ -5,6 +5,8 @@ export interface Card {
   cvc: string;
 }
 
+export type HandlerType = "success" | "fail";
+
 export interface HandlerProps {
   email?: string;
   customerId?: string;
@@ -17,4 +19,8 @@ export interface HandlerProps {
   name?: string;
   help?: string;
   apiKey?: string;
+}
+
+export interface ExtendedHandlerPros extends HandlerProps {
+  type: HandlerType;
 }

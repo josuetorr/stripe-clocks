@@ -13,10 +13,10 @@ try {
     displayHelp();
     process.exit(0);
   }
-  const { apiKey, ...parsedArgs } = parseArgs();
+  const parsedArgs = parseArgs();
 
   const handler = new StripeHandlerFactory().makeStripeHandler(parsedArgs);
-  console.log(await handler.handleRequest());
+  await handler.handleRequest();
 } catch (error: any) {
   if (error instanceof InvalidArgError) {
     console.error(error.message);

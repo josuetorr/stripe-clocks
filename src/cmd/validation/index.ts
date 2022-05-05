@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { argv } from "process";
-import { HandlerProps } from "src/interfaces/index.js";
+import { ExtendedHandlerPros, HandlerType } from "src/interfaces/index.js";
 
 export class InvalidArgError extends Error {
   code: number;
@@ -72,11 +72,16 @@ const validateArgs = (args: any) => {
     );
 };
 
-export const parseArgs = (): HandlerProps => {
-  const args = argv.slice(2).reduce((acc, current) => {
-    const [flag, arg] = current.split("=");
-    return { ...acc, [flag.replace("--", "")]: arg };
-  }, {});
+export const parseArgs = (): ExtendedHandlerPros => {
+  const defaultType: HandlerType = "success";
+
+  const args = argv.slice(2).reduce(
+    (acc, current) => {
+      const [flag, arg] = current.split("=");
+      return { ...acc, [flag.replace("--", "")]: arg };
+    },
+    { type: defaultType }
+  );
 
   validateArgs(args);
 

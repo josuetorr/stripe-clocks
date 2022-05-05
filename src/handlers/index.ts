@@ -7,10 +7,10 @@ export abstract class StripeHandler {
   private _paymentMethod?: string;
   private _card?: Card;
 
-  constructor(props: HandlerProps, apiKey?: string) {
-    if (!apiKey)
+  constructor(props: HandlerProps) {
+    if (!props.apiKey)
       throw new InvalidArgError(1, "Error: Stripe api key is required");
-    this._stripe = new Stripe(apiKey, { apiVersion: "2020-08-27" });
+    this._stripe = new Stripe(props.apiKey, { apiVersion: "2020-08-27" });
 
     if (props.paymentMethod) {
       this._paymentMethod = props.paymentMethod;
