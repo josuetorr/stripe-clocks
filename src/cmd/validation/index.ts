@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { argv } from "process";
+import { HandlerProps } from "src/interfaces/index.js";
 
 export class InvalidArgError extends Error {
   code: number;
@@ -12,9 +13,9 @@ export class InvalidArgError extends Error {
 
 export const VALID_FLAGS = {
   email: { description: "\t\tcustomer email" },
-  "customer-id": { description: "\t\tcustomer id" },
-  "payment-method": { description: "\tstripe payment method" },
-  "card-number": { description: "\t\tcredit or debit card number" },
+  customerId: { description: "\t\tcustomer id" },
+  paymentMethod: { description: "\tstripe payment method" },
+  cardNumber: { description: "\t\tcredit or debit card number" },
   exp: { description: "\t\t\tcard expiration date (MM-YYYY)" },
   cvc: { description: "\t\t\tcard cvc number" },
   startAt: {
@@ -26,35 +27,51 @@ export const VALID_FLAGS = {
   },
   name: { description: "\t\tname of test" },
   help: { description: "\t\tshow this content" },
-  "stripe-api-key": {
+  apiKey: {
     description: "\tapi key provided by stripe (required)",
   },
 };
 
-export const validateArgs = () => {
-  const args = argv.slice(2);
+export const parseArgs = (): HandlerProps => {
+  const args = argv.slice(2).reduce((acc, current) => {
+    const [flag, arg] = current.split("=");
+    return { ...acc, [flag.replace("--", "")]: arg };
+  }, {});
 
-  for (const arg of args) {
-    const flag = arg.split("=")[0].replace("--", "");
+  for (const flag of Object.keys(args)) {
     if (!Object.keys(VALID_FLAGS).includes(flag))
       throw new InvalidArgError(1, `Unknown flag: ${chalk.bold(flag)}`);
   }
 
-  const apiKey = args.reduce((key, arg) => {
-    let [flag, value] = arg.split("=");
-    flag = flag.replace("--", "");
+  // make sure either paymentMethod is defined or the information for a card, i.e. number, exp, cvc
+  const { paymentMethod, cardNumber, exp, cvc } = Object.entries(args)
+    .filter(
+      ([flag]) =>
+        flag === "paymentMethod" ||
+        flag === "cardNumber" ||
+        flag === "cvc" ||
+        flag === "exp"
+    )
+    .reduce(
+      (acc, [flag, arg]) => {
+        return { ...acc, [flag]: arg };
+      },
+      { paymentMethod: "", cardNumber: "", cvc: "", exp: "" }
+    );
 
-    if (!key && flag === "stripe-api-key") key = value;
-    return key;
-  }, "");
+  if (!paymentMethod && (!cardNumber || !exp || !cvc))
+    throw new InvalidArgError(
+      1,
+      `Please enter a payment method: ${chalk.bold(
+        "[paymentMethod] | [cardNumber cvc exp])"
+      )}`
+    );
 
-  if (!apiKey) throw new InvalidArgError(1, "Stripe api key is required");
+  if (!paymentMethod && !exp.match(/\d\d-\d\d\d\d/))
+    throw new InvalidArgError(
+      1,
+      `Please enter a valid date for exp ${chalk.bold("(MM-YYYY)")}`
+    );
+
+  return args;
 };
-
-export const parseArgs = () =>
-  argv.slice(2).reduce((acc, arg) => {
-    let [flag, value] = arg.split("=");
-    flag = flag.replace("--", "");
-    acc = { ...acc, [flag]: value };
-    return acc;
-  }, {});
