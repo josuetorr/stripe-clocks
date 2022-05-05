@@ -11,6 +11,9 @@ export class InvalidArgError extends Error {
   }
 }
 
+const DATE_FORMAT = "DD-MM-YYYY";
+const EXP_DATE_FORMAT = "MM-YYYY";
+
 export const VALID_FLAGS = {
   email: { description: "\t\tcustomer email" },
   customerId: { description: "\t\tcustomer id" },
@@ -34,6 +37,9 @@ export const VALID_FLAGS = {
     description: "\t\tapi key provided by stripe (required)",
   },
 };
+
+const isValidDateFormat = (str: string) =>
+  str.match(/\d\d(-|\/)\d\d(-|\/)\d\d\d\d/);
 
 const validateArgs = (args: any) => {
   for (const flag of Object.keys(args)) {
@@ -65,10 +71,22 @@ const validateArgs = (args: any) => {
       )}`
     );
 
-  if (!paymentMethod && !exp.match(/\d\d-\d\d\d\d/))
+  // validate dates
+  if (!paymentMethod && !exp.match(/\d\d(-|\/)\d\d\d\d/))
     throw new InvalidArgError(
       1,
-      `Please enter a valid date for exp ${chalk.bold("(MM-YYYY)")}`
+      `Please enter a valid date for exp ${chalk.bold(`(${EXP_DATE_FORMAT})`)}`
+    );
+
+  if (args.startAt && !isValidDateFormat(args.startAt))
+    throw new InvalidArgError(
+      1,
+      `Invalid format for ${chalk.bold("startAt")} (${DATE_FORMAT})`
+    );
+  if (args.endAt && !isValidDateFormat(args.endAt))
+    throw new InvalidArgError(
+      1,
+      `Invalid format for ${chalk.bold("endAt")} (${DATE_FORMAT})`
     );
 };
 

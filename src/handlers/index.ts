@@ -6,6 +6,8 @@ export abstract class StripeHandler {
   protected _stripe: Stripe;
   private _paymentMethod?: string;
   private _card?: Card;
+  private _startAt: number;
+  private _endAt: number;
 
   constructor(props: HandlerProps) {
     if (!props.apiKey)
@@ -23,6 +25,10 @@ export abstract class StripeHandler {
         exp_year: parseInt(year),
       };
     }
+
+    const today = new Date()
+    this._startAt = props.startAt ?? today.getTime()
+    this._endAt = props.endAt
   }
 
   abstract handleRequest(): Promise<void>;
@@ -40,14 +46,3 @@ export abstract class StripeHandler {
   }
 }
 
-export class RenewSuccessStripeHandler extends StripeHandler {
-  async handleRequest(): Promise<void> {
-    console.log("successful");
-  }
-}
-
-export class RenewFailedStripeHandler extends StripeHandler {
-  async handleRequest(): Promise<void> {
-    console.log("failure");
-  }
-}

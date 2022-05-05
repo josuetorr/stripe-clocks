@@ -1,9 +1,7 @@
 import { ExtendedHandlerPros } from "../interfaces/index.js";
-import {
-  RenewFailedStripeHandler,
-  RenewSuccessStripeHandler,
-  StripeHandler,
-} from "./index.js";
+import { StripeHandler } from "./index.js";
+import RenewFailedStripeHandler from "./RenewFailedStripeHandler.js";
+import RenewSuccessStripeHandler from "./RenewSuccessStripeHandler.js";
 
 export default class StripeHandlerFactory {
   makeStripeHandler(options: ExtendedHandlerPros): StripeHandler {
