@@ -1,3 +1,5 @@
+import Stripe from "stripe";
+
 export interface Card {
   number: string;
   exp_month: number;
@@ -7,7 +9,7 @@ export interface Card {
 
 export type HandlerType = "success" | "fail";
 
-export interface HandlerProps {
+export interface ParsedArguments {
   email?: string;
   customerId?: string;
   paymentMethod?: string;
@@ -21,6 +23,14 @@ export interface HandlerProps {
   apiKey?: string;
 }
 
-export interface ExtendedHandlerPros extends HandlerProps {
+export interface ExtendedParsedArguments extends ParsedArguments {
   type: HandlerType;
+}
+
+export interface HandlerProps {
+  stripe: Stripe;
+  paymentMethod: Stripe.PaymentMethod;
+  customer: Stripe.Customer;
+  clock: Stripe.TestHelpers.TestClock;
+  endAt?: string;
 }

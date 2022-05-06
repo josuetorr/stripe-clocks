@@ -1,6 +1,9 @@
 import chalk from "chalk";
 import { argv } from "process";
-import { ExtendedHandlerPros, HandlerType } from "src/interfaces/index.js";
+import {
+  ExtendedParsedArguments,
+  HandlerType,
+} from "../../interfaces/index.js";
 
 export class InvalidArgError extends Error {
   code: number;
@@ -88,7 +91,7 @@ const validateArgs = (args: any) => {
     );
 };
 
-export const parseArgs = (): ExtendedHandlerPros => {
+export const parseArgs = (): ExtendedParsedArguments => {
   const defaultType: HandlerType = "success";
 
   const args = argv.slice(2).reduce(

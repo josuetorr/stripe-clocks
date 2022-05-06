@@ -1,4 +1,4 @@
-import { StripeHandler } from "./index.js";
+import StripeHandler from "./index.js";
 
 export default class RenewSuccessStripeHandler extends StripeHandler {
   async handleRequest(): Promise<void> {
@@ -6,6 +6,6 @@ export default class RenewSuccessStripeHandler extends StripeHandler {
       name: "Jimbob's product",
       test: "something",
     });
-    // console.log(sub);
+    console.log(sub);
   }
 }

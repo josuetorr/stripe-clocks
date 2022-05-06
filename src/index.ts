@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { InvalidArgError, displayHelp, parseArgs } from "./cmd/index.js";
 import { argv } from "process";
+import { InvalidArgError, displayHelp, parseArgs } from "./cmd/index.js";
 import StripeHandlerFactory from "./handlers/Factory.js";
 
 try {
@@ -15,7 +15,9 @@ try {
   }
   const parsedArgs = parseArgs();
 
-  const handler = new StripeHandlerFactory().makeStripeHandler(parsedArgs);
+  const handler = await new StripeHandlerFactory().makeStripeHandler(
+    parsedArgs
+  );
   await handler.handleRequest();
 } catch (error: any) {
   if (error instanceof InvalidArgError) {
